@@ -3,20 +3,28 @@ import diagnosis from "../data/diagnosis.json";
 import { judge } from "../lib/score";
 import ResultView from "./ResultView";
 import DebugPanel from "./DebugPanel";
+import { useState } from "react"; /* A1.使用 useState 记住当前题号*/
 
 function DiagnosisPlayer() {
-  // ① 質問番号を useState で覚える
-  const currentQuestion = 0;
-  // ④ 回答記録を useState で覚える
-  const answers = {};
+  /* A2.質問番号を useState で覚える */
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  // currentQuestion:今の値 ＆ setCurrentQuestion:更新函数
+  // useState(0)	创建状态，初始值为0
+  
+  // state：Reactが覚えている値 ＆ setState：stateを更新する関数
+  // stateが更新されると、Reactが自動的に画面を更新する
 
+  // ④ 回答記録を useState で覚える
+  const [answers, setAnswers] = useState({});
   const question = diagnosis.questions[currentQuestion];
   const isFinished = question === undefined;
 
   // 次の質問へ進む（最後の質問では止まる）
   function handleNext() {
+    //判断：现在是不是最后一题？
     if (currentQuestion < diagnosis.questions.length - 1) {
-      // ② ここで、質問番号を更新する
+      /* A3.ここで、質問番号を更新する */
+      setCurrentQuestion(currentQuestion + 1); //把当前题号加1，并让 React 更新画面。
     }
   }
 
@@ -66,6 +74,7 @@ function DiagnosisPlayer() {
             key={choice.id}
             className={choice.id === selectedId ? "choice selected" : "choice"}
             /* ⑤ onClick を書く */
+            onClick={() => handleChoose(choice)}
           >
             {choice.text}
           </button>
@@ -74,10 +83,10 @@ function DiagnosisPlayer() {
 
       <button
         className="next"
-        /* ③ onClick を書く */
-        /* ⑥ 実習②で、この7行を差し替える */
+        onClick={handleAnswerNext}
+        disabled={!answers[question.id]}
       >
-        次へ
+        回答して進む
       </button>
 
       <DebugPanel currentQuestion={currentQuestion} answers={answers} />
